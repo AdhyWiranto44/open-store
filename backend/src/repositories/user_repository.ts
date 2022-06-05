@@ -1,44 +1,48 @@
-import DatabaseHelper from "../database/DatabaseHelper";
+import { Sequelize } from "sequelize";
 import UserInterface from "../interfaces/user_interface";
-import User from "../models/User";
+
 
 class UserRepository {
 
-  connection: any = null;
+  connection: Sequelize;
 
   constructor() {
-    this.connection = DatabaseHelper.getConnection();
+    this.connection = new Sequelize(String(process.env.DB_CONNECTION_URL));
   }
 
-  async getAll(filter: any = {}, limit: number = 1, skip: number = 0) {
-    const users = await User.find(filter)
-    .limit(limit)
-    .skip(skip)
-    .sort({ created_at: -1 })
-    .exec();
-
+  async getAll(filter: any = {}, limit: number = 1, skip: number = 0): Promise<any> {
+    const [users, metadata] = await this.connection.query(`SELECT * FROM users LIMIT ${limit} OFFSET ${skip}`);
     return users;
   }
 
   async getOne(username: string) {
-    let user = await User.findOne({ "username": username });
+    const [user, metadata] = await this.connection.query(
+      `SELECT * FROM users WHERE username='${username}' LIMIT 1`
+    );
     return user;
   }
 
   async insertOne(user: UserInterface) {
-    const created = await new User(user).save();
+    const [created, metadata] = await this.connection.query({
+      query: `INSERT INTO users(id, username, password, role, created_at, updated_at) VALUES ($1, $2, $3, $4, now(), now()) RETURNING *`, 
+      values: Object.values(user)
+    });
 
     return created;
   }
 
   async update(username: string, user: UserInterface) {
-    const updated = User.findOneAndUpdate({username}, user, { runValidators: true });
+    const [updated, metadata] = await this.connection.query(
+      `UPDATE users SET ${user} WHERE username='${username}' RETURNING *`
+    );
 
     return updated;
   }
 
   async remove(username: string) {
-    const removed = User.findOneAndRemove({username});
+    const [removed, metadata] = await this.connection.query(
+      `DELETE FROM users WHERE username='${username}' RETURNING *`
+    );
 
     return removed;
   }

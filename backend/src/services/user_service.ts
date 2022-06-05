@@ -32,7 +32,8 @@ export default class UserService {
     newUser.password = hashSync(Buffer.from(newUser.password).toString(), ROUNDS)
 
     const userChecked = await new UserRepository().getOne(Buffer.from(newUser.username).toString());
-    if (userChecked !== null) throw createError(StatusCodes.BAD_REQUEST, "User already exists.");
+    
+    if (userChecked !== null && userChecked !== undefined) throw createError(StatusCodes.BAD_REQUEST, "User already exists.");
     const user = await new UserRepository().insertOne(newUser);
 
     return user;

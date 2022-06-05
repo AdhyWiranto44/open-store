@@ -8,10 +8,10 @@ const userController = new UserController();
 const authentication = new Authentication();
 
 router.get("/users", userController.getAll);
-router.get("/users/:username", authentication.authenticate, userController.getOne);
-router.post("/users", authentication.authenticate, userController.create);
-router.patch("/users/:username", authentication.authenticate, userController.update);
-router.delete("/users/:username", authentication.authenticate, userController.delete);
+router.get("/users/:username", userController.getOne);
+router.post("/users", userController.create);
+router.patch("/users/:username", userController.update);
+router.delete("/users/:username", userController.delete);
 
 
 export default router;
