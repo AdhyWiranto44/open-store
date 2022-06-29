@@ -1,14 +1,27 @@
-import { connect, connection, createConnection } from "mongoose";
-import { Sequelize } from "sequelize/types";
+import { Sequelize } from "sequelize";
+import { LOCAL_ENV, PRODUCTION_ENV } from "../helpers/constants";
 
 
-class Connection extends Sequelize {
+class Connection {
 
-  connection;
+  static conn: any = null;
 
-  constructor() {
-    super();
-    this.connection = new Sequelize(String(process.env.DB_CONNECTION_URL));
+  static connect() {
+    if (Connection.conn === null) {
+      console.log("Creating new connection...");
+      Connection.conn = new Sequelize(`postgres://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`);
+      console.log("New connetion created.");
+    }
+
+    return Connection.conn;
+  }
+
+  closeConnection() {
+    return Connection.conn.closeConnection();
+  }
+
+  dropDatabase() {
+    return Connection.conn.dropDatabase();
   }
 }
 
