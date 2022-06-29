@@ -1,48 +1,80 @@
-import { Sequelize } from "sequelize";
+import { DataTypes, Op, Sequelize } from "sequelize";
+import Connection from "../database/Connection";
 import UserInterface from "../interfaces/user_interface";
+import User from "../../models/User";
 
 
 class UserRepository {
 
-  connection: Sequelize;
+  connection: any = null;
 
   constructor() {
-    this.connection = new Sequelize(String(process.env.DB_CONNECTION_URL));
+    this.connection = Connection.connect();
   }
 
-  async getAll(filter: any = {}, limit: number = 1, skip: number = 0): Promise<any> {
-    const [users, metadata] = await this.connection.query(`SELECT * FROM users LIMIT ${limit} OFFSET ${skip}`);
+  async getAll(filter: any = {}, limit: number = 1, skip: number = 0) {
+    const users = await User(this.connection, DataTypes)
+      .findAll({
+        where: {
+          ...filter,
+          username: {
+            [Op.like]: filter.username !== undefined ? `${filter.username}%` : `%`
+          }
+        }, limit: limit, offset: skip,
+        order: [['createdAt', 'DESC']]
+      });
+      
     return users;
   }
 
   async getOne(username: string) {
-    const [user, metadata] = await this.connection.query(
-      `SELECT * FROM users WHERE username='${username}' LIMIT 1`
-    );
+    const user = await User(this.connection, DataTypes)
+      .findOne({
+        where: {username}
+      });
+      
     return user;
   }
 
   async insertOne(user: UserInterface) {
-    const [created, metadata] = await this.connection.query({
-      query: `INSERT INTO users(id, username, password, role, created_at, updated_at) VALUES ($1, $2, $3, $4, now(), now()) RETURNING *`, 
-      values: Object.values(user)
-    });
+    await User(this.connection, DataTypes)
+      .create(
+        {...user, createdAt: new Date(), updatedAt: new Date()}
+      );
+
+    const created = await User(this.connection, DataTypes)
+      .findOne(
+        {where: {username: user.username}}
+      );
 
     return created;
   }
 
   async update(username: string, user: UserInterface) {
-    const [updated, metadata] = await this.connection.query(
-      `UPDATE users SET ${user} WHERE username='${username}' RETURNING *`
-    );
+    await User(this.connection, DataTypes)
+      .update(
+        {...user, updatedAt: new Date()}, 
+        {where: {username}
+      });
+
+    const updated = await User(this.connection, DataTypes)
+      .findOne(
+        {where: {username}}
+      );
 
     return updated;
   }
 
   async remove(username: string) {
-    const [removed, metadata] = await this.connection.query(
-      `DELETE FROM users WHERE username='${username}' RETURNING *`
+    const removed = await User(this.connection, DataTypes)
+    .findOne(
+      {where: {username}}
     );
+
+    await  User(this.connection, DataTypes)
+      .destroy({
+        where: {username}
+      });
 
     return removed;
   }
