@@ -1,1 +1,0 @@
-# This is client for buyer folder
