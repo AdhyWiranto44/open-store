@@ -10,3 +10,4 @@ Struktur proyek (Branches)
 - Client-Admin: Client untuk frontend bagian admin
 - Client-Buyer: Client untuk frontend bagian pembeli
 - Client-Seller: Client untuk frontend bagian seller
+- Client-Login: Client untuk frontend bagian login & registrasi
