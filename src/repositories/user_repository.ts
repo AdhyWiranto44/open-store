@@ -1,6 +1,5 @@
 import { DataTypes, Op, Sequelize } from "sequelize";
 import Connection from "../database/Connection";
-import UserInterface from "../interfaces/user_interface";
 import User from "../../models/User";
 
 
@@ -36,7 +35,7 @@ class UserRepository {
     return user;
   }
 
-  async insertOne(user: UserInterface) {
+  async insertOne(user: any) {
     await User(this.connection, DataTypes)
       .create(
         {...user, createdAt: new Date(), updatedAt: new Date()}
@@ -50,7 +49,7 @@ class UserRepository {
     return created;
   }
 
-  async update(username: string, user: UserInterface) {
+  async update(username: string, user: any) {
     await User(this.connection, DataTypes)
       .update(
         {...user, updatedAt: new Date()}, 

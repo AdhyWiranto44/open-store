@@ -67,7 +67,8 @@ class UserController {
         }
       ).sendResponse();
     } catch (err: any) {
-      return new ApiService(res).sendErrorResponse(err);
+      console.log(new Error(err));
+      // return new ApiService(res).sendErrorResponse(err);
     }
   }
 

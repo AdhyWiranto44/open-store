@@ -25,12 +25,17 @@ const User = sequelize.define('User', {
       key: "id"
     },
     type: DataTypes.INTEGER,
-    allowNull: false
+    allowNull: false,
+    defaultValue: 0
   },
   username: {
     type: DataTypes.STRING,
     allowNull: false,
     unique: true
+  },
+  password: {
+    type: DataTypes.STRING,
+    allowNull: false
   },
   full_name: {
     type: DataTypes.STRING,
@@ -44,17 +49,24 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING,
     allowNull: false
   },
-  password: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
-  created_at: {
+  birthday: {
     type: DataTypes.DATE,
     allowNull: false
   },
+  profile_photo: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    defaultValue: ""
+  },
+  created_at: {
+    type: DataTypes.DATE,
+    allowNull: false,
+    defaultValue: new Date()
+  },
   updated_at: {
     type: DataTypes.NOW,
-    allowNull: false
+    allowNull: false,
+    defaultValue: new Date()
   }
 });
 

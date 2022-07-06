@@ -2,7 +2,6 @@ import { hashSync } from "bcrypt";
 import UserRepository from "../repositories/user_repository";
 import { StatusCodes } from 'http-status-codes';
 import createError from 'http-errors';
-import UserInterface from "../interfaces/user_interface";
 import { ROUNDS } from "../helpers/constants";
 
 
@@ -26,7 +25,7 @@ export default class UserService {
     return user;
   }
 
-  async create(newUser: UserInterface) {
+  async create(newUser: any) {
     if (Object.keys(newUser).length === 0) throw createError(StatusCodes.BAD_REQUEST, "Data can't be empty.");
 
     newUser.password = hashSync(Buffer.from(newUser.password).toString(), ROUNDS)
@@ -39,7 +38,7 @@ export default class UserService {
     return user;
   }
 
-  async update(updateUser: UserInterface, username: string) {
+  async update(updateUser: any, username: string) {
     if (Object.keys(updateUser).length === 0) throw createError(StatusCodes.BAD_REQUEST, "Data can't be empty.");
 
     if (updateUser.password && updateUser.password != "") {
